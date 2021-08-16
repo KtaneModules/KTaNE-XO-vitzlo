@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using KModkit;
-using NUnit.Framework;
 
 public class xoScript: MonoBehaviour {
 
@@ -18,23 +17,27 @@ public class xoScript: MonoBehaviour {
     public TextMesh inputTextMesh;
     public TextMesh[] gridTextMeshes;
 
-    private const string alphabet = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    private const string boardAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ🚫";
+    private const string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ!";
     private const string pieces = "X O";
     private readonly string[] loggingPieces = {"X mark", "empty space", "O mark"};
     private readonly string[] locations = {"top-left", "top-middle", "top-right", "middle-left", "center", "middle-right",
         "bottom-left", "bottom-middle", "bottom-right"};
-    private string[] yesList = {"YEA", "YUP", "2EZ", "TKO", "WIN", "DUB"},
+    private readonly string[] yesList = {"YEA", "YUP", "2EZ", "TKO", "WIN", "DUB"},
         noList = {"HUH", "HOW", "UHH", "404", "LOL", "RIP"};
+    private const float animateDelay = 0.13f;
+    private const float submitDelay = 0.5f;
 
     private string moduleKey, inputText, answer;
     private List<BoardSet> answerBoards = new List<BoardSet>();
     private List<List<BoardSet>> boardPool = new List<List<BoardSet>>(), backupBoardPool = new List<List<BoardSet>>();
     private List<string> wordBank;
+    private int audioPointer = 7;
+    private readonly List<string> audioNames = new List<string>() {"pagePressF#2", "pagePressF#3", "pagePressE2",
+        "pagePressE3", "pagePressF#2", "pagePressF#3", "pagePressE2", "pagePressA3"};
     
-    private int currentBoard, currentLetterPage;
-    private int gameState; // 0-5: viewing board  6-8: submission pages 9: solved module 10: struck module
-    private bool animateState = false;
+    private int currentBoard, currentLetterPage, gameState; // 0-5: viewing board  6-8: submission pages 9: solved module 10: struck module
+    private bool animateState;
+    private char currentHighlightedLetter;
 
     static int moduleIdCounter = 1;
     int moduleId;
@@ -52,19 +55,22 @@ public class xoScript: MonoBehaviour {
             "FAMILY", "FATHER", "FILTER", "FLOWER", "FORMAL", "FORMAT", "FROZEN", "GARLIC", "GRAVEL", "GROUND", "GUITAR",
             "HARBOR", "HEAVEN", "HUNTER", "INJURY", "INVITE", "ISLAND", "JOCKEY", "JUNGLE", "JUNIOR",
             "KEYPAD", "KIDNEY", "LAUNCH", "LINEAR", "MAKEUP", "MARBLE", "MARINE", "MARKET", "MEADOW", "MEMBER", "METHOD", "MISERY",
-            "NATIVE", "NUMBER", "PATENT", "PERIOD", "PLANET", "PLEASE", "PUBLIC", "PUNISH", "QUAINT"
+            "NATIVE", "NUMBER", "PATENT", "PERIOD", "PLANET", "PLEASE", "PUBLIC", "PUNISH", "QUAINT",
+            "REMAIN", "REMARK", "REMIND", "RESCUE", "RETAIN", "RETIRE", "REVEAL", "REVIEW", "REVISE", "REVIVE", "REVOKE", "RHYTHM", "ROTATE",
+            "SAFARI", "SCHEME", "SCRAPE", "SERIAL", "SHADOW", "SINGLE", "SNATCH", "SWITCH", "SYMBOL", "TEMPLE", "THEORY", "THREAD", "TIPTOE",
+            "UNFAIR", "UNIQUE", "UNLIKE", "UPDATE", "VOLUME", "WAITER", "WEALTH", "WORKER", "WINTER", "WRITER"
         }; // no two adjacent letters can have the same highlight
         InitializeBoardPool();
         
         for (int i = 0; i < 9; i++) boardButtons[i].OnInteract = BoardPress(i);
         for (int i = 0; i < 3; i++) pageButtons[i].OnInteract = PagePress(i);
+        inputTextMesh.color = Color.white;
 
         answer = wordBank[UnityEngine.Random.Range(0, wordBank.Count)];
-        int snKey = (alphabet.IndexOf(Bomb.GetSerialNumber()[3]) - Bomb.GetSerialNumberNumbers().Sum() + 14) % 27;
-        while (snKey < 0) {
-            snKey += 27;
-        }
+        int snKey = alphabet.IndexOf(Bomb.GetSerialNumber()[3]) - Bomb.GetSerialNumberNumbers().Sum();
+        while (snKey < 0) snKey += 26;
         moduleKey = alphabet.Substring(snKey, 27 - snKey) + alphabet.Substring(0, snKey);
+        moduleKey = moduleKey.Substring(14, 13) + moduleKey.Substring(0, 14);
         Debug.LogFormat("[XO #{0}] The grid is as follows:", moduleId);
         for (int i = 0; i < 3; i++) {
             Debug.LogFormat("[XO #{0}] {1} {2} {3}", moduleId, moduleKey.Substring(i * 9, 3),
@@ -157,27 +163,61 @@ public class xoScript: MonoBehaviour {
             new BoardSet("  O   XX ", "  O  XXXO"),
             new BoardSet("O    X  X", "OXO  X  X")
         });
+        boardPool.Add(new List<BoardSet>() {
+            new BoardSet("  X  OX  ", "OXXXOOXOX"), // ..X > OXX
+            new BoardSet("XO      X", "XOXXOOOXX"), // ..O > XOO
+            new BoardSet("  XO  X  ", "XOXOOXXXO"), // X.. > XOX and its variations
+            new BoardSet("X      OX", "XXOOOXXOX"),
+            new BoardSet("X  O    X", "XXOOOXXOX"),
+            new BoardSet("  X   XO ", "OXXXOOXOX"),
+            new BoardSet("X    O  X", "XOXXOOOXX"),
+            new BoardSet(" OX   X  ", "XOXOOXXXO")
+        });
+        boardPool.Add(new List<BoardSet>() {
+            new BoardSet(" OOX   X ", "XOOXXOOXX"), // .OO > XOO
+            new BoardSet("O  O X X ", "OOXOXXXXO"), // X.. > XXO
+            new BoardSet(" X   XOO ", "OXOXXXOOX"), // .X. > OXX and its variations
+            new BoardSet(" X X O  O", "OXXXXOOXO"),
+            new BoardSet("OO   X X ", "OOXOXXXXO"),
+            new BoardSet(" X O XO  ", "XXOOXXOOX"),
+            new BoardSet(" X X   OO", "OXOXXXXOO"),
+            new BoardSet("  OX O X ", "OXOXXOOXX")
+        });
+        boardPool.Add(new List<BoardSet>() {
+            new BoardSet("XO      X", "XOXXOOOXX"), // XO. > XOX
+            new BoardSet("  XO  X  ", "XOXOOXXXO"), // ... > XOO
+            new BoardSet("X      OX", "XXOOOXXOX"), // ..X > OXX and its variations
+            new BoardSet("  X  OX  ", "OXXXOOXOX"),
+            new BoardSet(" OX   X  ", "XOXOOXXXO"),
+            new BoardSet("X  O    X", "XXOOOXXOX"),
+            new BoardSet("  X   XO ", "OXXXOOXOX"),
+            new BoardSet("X    O  X", "XOXXOOOXX")
+        });
     }
 
     void Update () {
-
+        
     }
 
     // handles interactions inside the board
     private KMSelectable.OnInteractHandler BoardPress(int i) {
         return delegate {
-            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, boardButtons[i].transform);
             boardButtons[i].AddInteractionPunch(.1f);
 
             if (gameState == 9 || animateState) {
                 return false;
             }
+            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, boardButtons[i].transform);
             if (gameState == 8 && i == 8) {
-                ModifyInputText("");
+                if (inputText.Length > 0) {
+                    ModifyInputText(inputText.Substring(0, inputText.Length - 1));
+                }
+                currentHighlightedLetter = ' ';
                 UpdateBoard();
             }
             else if (gameState >= 6) {
-                ModifyInputText(inputText + alphabet[(gameState - 6) * 9 + i + 1]);
+                currentHighlightedLetter = alphabet[(gameState - 6) * 9 + i];
+                ModifyInputText(inputText + currentHighlightedLetter);
                 UpdateBoard();
                 if (inputText.Length == 6 && inputText == answer) {
                     gameState = 9;
@@ -197,8 +237,7 @@ public class xoScript: MonoBehaviour {
     // handles page interactions
     private KMSelectable.OnInteractHandler PagePress(int i) {
         return delegate {
-            Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, boardButtons[i].transform);
-            boardButtons[i].AddInteractionPunch(.1f);
+            pageButtons[i].AddInteractionPunch(.1f);
 
             if (gameState == 9 || animateState) {
                 return false;
@@ -212,11 +251,13 @@ public class xoScript: MonoBehaviour {
                 StartCoroutine(AnimateToBoards());
             }
             else if (gameState >= 6) {
+                Audio.PlayGameSoundAtTransform(KMSoundOverride.SoundEffect.ButtonPress, pageButtons[i].transform);
                 currentLetterPage = (currentLetterPage + i - 1) % 3 + 6;
                 gameState = currentLetterPage;
                 UpdateBoard();
             }
             else {
+                Audio.PlaySoundAtTransform(NextAudio(), Module.transform);
                 currentBoard = (currentBoard + i - 1) % 6;
                 currentBoard += (currentBoard == -1 ? 6 : 0);
                 gameState = currentBoard;
@@ -237,17 +278,10 @@ public class xoScript: MonoBehaviour {
             int textLength = inputText.Length;
             for (int i = 0; i < 9; i++) {
                 Color color;
-                if (gameState == 8 && i == 8) {
-                    color = Color.red;
-                }
-                else if (textLength > 0 && boardAlphabet.IndexOf(inputText[textLength - 1]) / 9 == gameState - 6 &&
-                         boardAlphabet.IndexOf(inputText[textLength - 1]) % 9 == i) {
-                    color = new Color32(214, 209, 49, 255);
-                }
-                else {
-                    color = new Color32(247, 135, 2, 255);
-                }
-                SetGridInfo(i, boardAlphabet[(gameState - 6) * 9 + i], color);
+                if (gameState == 8 && i == 8) color = Color.red;
+                else if (textLength > 0 && alphabet[(gameState - 6) * 9 + i] == currentHighlightedLetter) color = new Color32(214, 209, 49, 255);
+                else color = new Color32(247, 135, 2, 255);
+                SetGridInfo(i, alphabet[(gameState - 6) * 9 + i], color);
             }
         }
     }
@@ -256,8 +290,9 @@ public class xoScript: MonoBehaviour {
         animateState = true;
 
         for (int i = 0; i < 9; i++) {
+            Audio.PlaySoundAtTransform("animationTick", Module.transform);
             SetGridInfo(i, answerBoards[gameState].GetInitial(i), answerBoards[gameState].GetHighlight() == i ? new Color32(214, 209, 49, 255) : new Color32(247, 135, 2, 255));
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(animateDelay);
         }
 
         animateState = false;
@@ -269,19 +304,13 @@ public class xoScript: MonoBehaviour {
         int textLength = inputText.Length;
         
         for (int i = 0; i < 9; i++) {
+            Audio.PlaySoundAtTransform("animationTick", Module.transform);
             Color color;
-            if (gameState == 8 && i == 8) {
-                color = Color.red;
-            }
-            else if (textLength > 0 && boardAlphabet.IndexOf(inputText[textLength - 1]) / 9 == gameState - 6 &&
-                     boardAlphabet.IndexOf(inputText[textLength - 1]) % 9 == i) {
-                color = new Color32(214, 209, 49, 255);
-            }
-            else {
-                color = new Color32(247, 135, 2, 255);
-            }
-            SetGridInfo(i, boardAlphabet[(gameState - 6) * 9 + i], color);
-            yield return new WaitForSeconds(0.1f);
+            if (gameState == 8 && i == 8) color = Color.red;
+            else if (textLength > 0 && alphabet[(gameState - 6) * 9 + i] == currentHighlightedLetter) color = new Color32(214, 209, 49, 255);
+            else color = new Color32(247, 135, 2, 255);
+            SetGridInfo(i, alphabet[(gameState - 6) * 9 + i], color);
+            yield return new WaitForSeconds(animateDelay);
         }
 
         animateState = false;
@@ -292,23 +321,26 @@ public class xoScript: MonoBehaviour {
         animateState = true;
         Color colorBack = gameState == 9 ? Color.green : Color.red;
         for (int i = 0; i < 3; i++) {
+            Audio.PlaySoundAtTransform("animationTick", Module.transform);
             for (int j = 0; j < 3; j++) {
                 SetGridInfo(i * 3 + j, list[i][j], colorBack);
             }
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(submitDelay);
         }
-        if (gameState == 9)
-        {
+        if (gameState == 9) {
+            Audio.PlaySoundAtTransform("pagePressA3", Module.transform);
             inputTextMesh.color = Color.green;
             Module.HandlePass(); 
         }
         else {
             inputTextMesh.color = Color.red;
             Module.HandleStrike();
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(submitDelay);
             ModifyInputText("");
-            inputTextMesh.color = Color.black;
-            gameState = UnityEngine.Random.Range(0, 6);
+            inputTextMesh.color = Color.white;
+            currentBoard = UnityEngine.Random.Range(0, 6);
+            currentLetterPage = 6;
+            gameState = currentBoard;
             StartCoroutine(AnimateToBoards());
         }
         
@@ -321,19 +353,54 @@ public class xoScript: MonoBehaviour {
         gridColors[pos].material.color = color;
     }
 
-    private void ModifyInputText(string newText) {
-        inputText = newText;
-        inputTextMesh.text = newText + "      ".Substring(0, 6 - newText.Length);
+    private String NextAudio() {
+        audioPointer = (audioPointer + 1) % 8;
+        return audioNames[audioPointer];
     }
 
-#pragma warning disable 414
-    private readonly string TwitchHelpMessage = @"Use <!{0} foobar> to do something.";
+    private void ModifyInputText(string newText) {
+        inputText = newText;
+        inputTextMesh.text = inputText + "      ".Substring(0, 6 - inputText.Length);
+    }
+
+    #pragma warning disable 414
+    private readonly string TwitchHelpMessage = @"Use <!{0} up/down/toggle> to use the page buttons. Use <!{0} a1/tl/top-left/topleft/1> to press the top left button in the grid.
+        Commands can be chained with spaces.";
     #pragma warning restore 414
 
-    IEnumerator ProcessTwitchCommand (string command)
-    {
+    IEnumerator ProcessTwitchCommand (string command) {
+        List<string> pageNames = new List<string>() {"UP", "TOGGLE", "DOWN", "U", "T", "D"},
+            boardNames = new List<string>() {
+                "A1", "B1", "C1", "A2", "B2", "C2", "A3", "B3", "C3",
+                "TL", "TM", "TR", "ML", "MM", "MR", "BL", "BM", "BR",
+                "TOP-LEFT", "TOP-MIDDLE", "TOP-RIGHT", "MIDDLE-LEFT", "MIDDLE-MIDDLE", "MIDDLE-RIGHT", "BOTTOM-LEFT", "BOTTOM-MIDDLE", "BOTTOM-RIGHT",
+                "TOPLEFT", "TOPMIDDLE", "TOPRIGHT", "MIDDLELEFT", "MIDDLEMIDDLE", "MIDDLERIGHT", "BOTTOMLEFT", "BOTTOMMIDDLE", "BOTTOMRIGHT",
+                "1", "2", "3", "4", "5", "6", "7", "8", "9"
+            };
+        
         command = command.Trim().ToUpperInvariant();
-        List<string> parameters = command.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        List<string> parameters = command.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        if (parameters.Any(s => !pageNames.Contains(s) && !boardNames.Contains(s))) {
+            yield return "sendtochaterror Invalid command: " + parameters.First(s => !pageNames.Contains(s) && !boardNames.Contains(s));
+        }
+        else {
+            yield return null;
+            foreach (string s in parameters) {
+                if (pageNames.Contains(s)) {
+                    pageButtons[pageNames.IndexOf(s) % 3].OnInteract();
+                    yield return new WaitForSeconds(0.1f + (pageNames.IndexOf(s) % 3 == 1 ? animateDelay * 9 : 0));
+                }
+                else {
+                    boardButtons[boardNames.IndexOf(s) % 9].OnInteract();
+                    if (inputText.Length == 6) {
+                        yield return (inputText == answer ? "solve" : "strike");
+                        break;
+                    }
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+        }
+        
         yield return null;
     }
 

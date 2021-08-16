@@ -113,26 +113,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!102 &217760030 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102988265460535944, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &257493270 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102567699993905048, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &274264430 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102659968606040370, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &289761074 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102811761790638584, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
 --- !u!1001 &339258262
 Prefab:
   m_ObjectHideFlags: 0
@@ -140,6 +120,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.size
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 439642, guid: 8814ea52310d2614a9feda02ec355ae4, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -172,6 +157,36 @@ Prefab:
       propertyPath: m_RootOrder
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 90748216499219e4ab0e1a9b2d046fbe, type: 3}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 2f080781fbcedb9498242fb9ce980453, type: 3}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: a90169318eac9e84aadf15144f86d80d, type: 3}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: 8bc887019519ea8498db4dfbf8bebbbf, type: 3}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: cb9594fd077c25c47b9f277a8819e630, type: 3}
+    - target: {fileID: 114848120511536268, guid: 8814ea52310d2614a9feda02ec355ae4,
+        type: 2}
+      propertyPath: AudioClips.Array.data[5]
+      value: 
+      objectReference: {fileID: 8300000, guid: 837290f470eef0b4c95c95e1eb9c27b1, type: 3}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 8814ea52310d2614a9feda02ec355ae4, type: 2}
   m_IsPrefabParent: 0
@@ -182,11 +197,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.size
-      value: 9
-      objectReference: {fileID: 0}
     - target: {fileID: 4255976989066982, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -219,86 +229,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 23009604444602432, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: a086244c976384801b25627d5d4b7a92, type: 2}
-    - target: {fileID: 23273589595864876, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: a086244c976384801b25627d5d4b7a92, type: 2}
-    - target: {fileID: 23063815383451274, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: a086244c976384801b25627d5d4b7a92, type: 2}
-    - target: {fileID: 4926246109235800, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
-      propertyPath: m_LocalRotation.x
-      value: -1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4926246109235800, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4926246109235800, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 4926246109235800, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: -180
-      objectReference: {fileID: 0}
-    - target: {fileID: 4926246109235800, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[0]
-      value: 
-      objectReference: {fileID: 289761074}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[1]
-      value: 
-      objectReference: {fileID: 952022145}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[2]
-      value: 
-      objectReference: {fileID: 217760030}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[3]
-      value: 
-      objectReference: {fileID: 257493270}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[4]
-      value: 
-      objectReference: {fileID: 728123387}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[5]
-      value: 
-      objectReference: {fileID: 1260924927}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[6]
-      value: 
-      objectReference: {fileID: 1055649450}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[7]
-      value: 
-      objectReference: {fileID: 274264430}
-    - target: {fileID: 114417690073268936, guid: 603ff85d93977934185662c5e196d5ec,
-        type: 2}
-      propertyPath: gridTextMeshes.Array.data[8]
-      value: 
-      objectReference: {fileID: 1733048722}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 603ff85d93977934185662c5e196d5ec, type: 2}
   m_IsPrefabParent: 0
@@ -383,31 +313,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!102 &728123387 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102549029700513264, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &952022145 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102566052065698728, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &1055649450 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102019348473635336, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &1260924927 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102837856547065314, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
---- !u!102 &1733048722 stripped
-TextMesh:
-  m_PrefabParentObject: {fileID: 102626839091755598, guid: 603ff85d93977934185662c5e196d5ec,
-    type: 2}
-  m_PrefabInternal: {fileID: 527718907}
 --- !u!1 &2042271872
 GameObject:
   m_ObjectHideFlags: 0
