@@ -136,7 +136,7 @@ public class xoScript: MonoBehaviour {
         boardPool.Add(new List<BoardSet>() {
             new BoardSet("O     XXO", "OOX X XXO"), // O.. > OOX
             new BoardSet("  O  XO X", "O OXXXO X"), // ... > .X.
-            new BoardSet("OOX     O", "OXX X OXO"), // XXO > XXO and its variations
+            new BoardSet("OXX     O", "OXX X OXO"), // XXO > XXO and its variations
             new BoardSet("X OX  O  ", "X OXXOO X"),
             new BoardSet("  O   OXX", "OXO X OXX"),
             new BoardSet("O X  X  O", "O XOXXX O"),
