@@ -44,7 +44,7 @@ public class xoScript: MonoBehaviour {
     private bool moduleSolved;
 
     void Awake () {
-        moduleId = moduleIdCounter++;
+        moduleId = moduleIdCounter++; // version 1.0.2
         ModifyInputText("");
     }
 
@@ -129,7 +129,7 @@ public class xoScript: MonoBehaviour {
             new BoardSet("  OXOX   ", "OXOXOXX O"), // O.. > OOO and its variations
             new BoardSet("OX  O  X ", "OXXOO OXX"),
             new BoardSet("   XOX  O", "X XXOXOOO"),
-            new BoardSet(" XO O  X ", "OXXOO OXX"),
+            new BoardSet(" XO O  X ", "XXO OOXXO"),
             new BoardSet("O  XOX   ", "OXOXOXO X"),
             new BoardSet(" X  O OX ", "OXXXO OXO")
         });
@@ -193,10 +193,6 @@ public class xoScript: MonoBehaviour {
             new BoardSet("  X   XO ", "OXXXOOXOX"),
             new BoardSet("X    O  X", "XOXXOOOXX")
         });
-    }
-
-    void Update () {
-        
     }
 
     // handles interactions inside the board
