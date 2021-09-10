@@ -44,7 +44,7 @@ public class xoScript: MonoBehaviour {
     private bool moduleSolved;
 
     void Awake () {
-        moduleId = moduleIdCounter++; // version 1.0.2
+        moduleId = moduleIdCounter++; // version 1.1.0
         ModifyInputText("");
     }
 
@@ -54,7 +54,7 @@ public class xoScript: MonoBehaviour {
             "DOCTOR", "DRAGON", "DRAWER", "DRIVER", "EMBRYO", "EMPLOY", "ENERGY", "EXEMPT", 
             "FAMILY", "FATHER", "FILTER", "FLOWER", "FORMAL", "FORMAT", "FROZEN", "GARLIC", "GRAVEL", "GROUND", "GUITAR",
             "HARBOR", "HEAVEN", "HUNTER", "INJURY", "INVITE", "ISLAND", "JOCKEY", "JUNGLE", "JUNIOR",
-            "KEYPAD", "KIDNEY", "LAUNCH", "LINEAR", "MAKEUP", "MARBLE", "MARINE", "MARKET", "MEADOW", "MEMBER", "METHOD", "MISERY",
+            "KEYPAD", "LAUNCH", "LINEAR", "MAKEUP", "MARBLE", "MARINE", "MARKET", "MEADOW", "MEMBER", "METHOD", "MISERY",
             "NATIVE", "NUMBER", "PATENT", "PERIOD", "PLANET", "PLEASE", "PUBLIC", "PUNISH", "QUAINT",
             "REMAIN", "REMARK", "REMIND", "RESCUE", "RETAIN", "RETIRE", "REVEAL", "REVIEW", "REVISE", "REVIVE", "REVOKE", "RHYTHM", "ROTATE",
             "SAFARI", "SCHEME", "SCRAPE", "SERIAL", "SHADOW", "SINGLE", "SNATCH", "SWITCH", "SYMBOL", "TEMPLE", "THEORY", "THREAD", "TIPTOE",
@@ -98,13 +98,14 @@ public class xoScript: MonoBehaviour {
     private bool IterateBoards(int pos, char symbol, int pointer) {
         bool spilled = pointer >= boardPool.Count;
         List<BoardSet> currentPool = (spilled ? backupBoardPool[pointer - boardPool.Count] : boardPool[pointer]).Shuffle();
-        foreach (BoardSet board in currentPool){
+        foreach (BoardSet board in currentPool) {
             if (board.IsValid(pos, symbol)) {
                 board.SetHighlight(pos);
                 answerBoards.Add(board);
+                currentPool.Remove(board);
                 if (!spilled) {
-                    backupBoardPool.Add(boardPool[pointer]);
-                    boardPool.Remove(boardPool[pointer]);
+                    backupBoardPool.Add(currentPool);
+                    boardPool.Remove(currentPool);
                 }
                 return true;
             }
@@ -192,6 +193,16 @@ public class xoScript: MonoBehaviour {
             new BoardSet("X  O    X", "XXOOOXXOX"),
             new BoardSet("  X   XO ", "OXXXOOXOX"),
             new BoardSet("X    O  X", "XOXXOOOXX")
+        });
+        boardPool.Add(new List<BoardSet>() {
+            new BoardSet("O OX    X", "OXOX    X"), // O.O > OXO
+            new BoardSet("O X   OX ", "O XX  OX "), // X.. > X..
+            new BoardSet("X    XO O", "X    XOXO"), // ... > ..X and its variations
+            new BoardSet(" XO   X O", " XO  XX O"),
+            new BoardSet("O O  XX  ", "OXO  XX  "),
+            new BoardSet("OX    O X", "OX X  O X"),
+            new BoardSet("  XX  O O", "  XX  OXO"),
+            new BoardSet("X O    XO", "X O  X XO")
         });
     }
 

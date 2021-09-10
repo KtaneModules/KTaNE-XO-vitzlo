@@ -17,6 +17,6 @@ MonoBehaviour:
   description: "Keep your strikes in line.\n\r\nDecrypt a six-letter word using the
     states of six tic-tac-toe boards.\n\nModule by Vincology\r\n\r\nModule ID: xo\r\nManual
     can be found at ktane.timwi.de"
-  version: 1.0.0
+  version: 1.1.0
   outputFolder: build
   previewImage: {fileID: 2800000, guid: d1312139ad6a19743aea396f9426e26a, type: 3}
