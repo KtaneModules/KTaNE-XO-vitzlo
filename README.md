@@ -1,5 +1,7 @@
 # XO
 
+![XO Image](Assets/previewImage.png)
+
 My second modded module for Keep Talking and Nobody Explodes, XO. XO is a cipher-based module
 where unfinished tic-tac-toe boards are shown, and the games must be played out in order to 
 decrypt a six-letter word.
